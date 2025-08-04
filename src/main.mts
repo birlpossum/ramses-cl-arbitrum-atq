@@ -146,7 +146,31 @@ function transformPoolsToTags(chainId: string, pools: Pool[]): ContractTag[] {
   return validPools.map((pool) => {
     const token0 = pool.token0;
     const token1 = pool.token1;
-    const tagName = `${token0.symbol}/${token1.symbol} CL Pool`;
+    const feePct = getFeePct(pool);
+    const tick = pool.tickSpacing ?? 'N/A';
+    const suffix = ` CL Pool (${feePct}, tick: ${tick})`;
+    const maxSymbolsLen = 50 - suffix.length - 1; // -1 for '/'
+    let symbol0 = token0.symbol;
+    let symbol1 = token1.symbol;
+    let symbolsText = `${symbol0}/${symbol1}`;
+    if (symbolsText.length > maxSymbolsLen) {
+      // Truncate both symbols proportionally and add '...'
+      // Reserve space for two '...' (6 chars)
+      const ellipsis = '...';
+      const reserved = 6; // for two '...'
+      const available = maxSymbolsLen - reserved;
+      const half = Math.floor(available / 2);
+      let len0 = Math.ceil(half);
+      let len1 = Math.floor(available - len0);
+      if (symbol0.length > len0) symbol0 = symbol0.slice(0, len0) + ellipsis;
+      if (symbol1.length > len1) symbol1 = symbol1.slice(0, len1) + ellipsis;
+      symbolsText = `${symbol0}/${symbol1}`;
+    }
+    let tagName = `${symbolsText}${suffix}`;
+    // Safety check: truncate to 50 chars if off by 1 due to rounding
+    if (tagName.length > 50) {
+      tagName = tagName.slice(0, 50);
+    }
     return {
       "Contract Address": `eip155:${chainId}:${pool.id}`,
       "Public Name Tag": tagName,
