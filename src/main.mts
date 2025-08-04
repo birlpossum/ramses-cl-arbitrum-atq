@@ -174,9 +174,9 @@ function transformPoolsToTags(chainId: string, pools: Pool[]): ContractTag[] {
     return {
       "Contract Address": `eip155:${chainId}:${pool.id}`,
       "Public Name Tag": tagName,
-      "Project Name": "Ramses Concentrated Liquidity",
+      "Project Name": "Ramses",
       "UI/Website Link": "https://ramses.exchange",
-      "Public Note": `Ramses CL pool for ${token0.symbol} (${token0.name}) / ${token1.symbol} (${token1.name}), fee tier: ${pool.feeTier}, tick spacing: ${pool.tickSpacing ?? 'N/A'}`
+      "Public Note": `Ramses CL pool for ${token0.symbol} (${token0.name}) / ${token1.symbol} (${token1.name}), fee tier: ${feePct}, tick spacing: ${pool.tickSpacing ?? 'N/A'}`
     };
   });
 }
